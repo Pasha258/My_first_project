@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Севара — С Днём Рождения</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+
+html,body{
+  height:100%;
+  background:#0a0510;
+  font-family:'Cormorant Garamond',serif;
+  overflow:hidden;
+}
+
+body{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;min-height:100dvh;
+}
+
+/* ══════════════ PARTICLE CANVAS ══════════════ */
+#canvas{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+}
+
+/* ══════════════ CARD ══════════════ */
+.scene{
+  position:relative;z-index:2;
+  perspective:1200px;
+  width:min(480px,92vw);
+}
+
+.card{
+  width:100%;
+  background:linear-gradient(145deg,#1a0a2e 0%,#0d0618 40%,#1a0525 100%);
+  border-radius:16px;
+  padding:clamp(32px,7vw,56px) clamp(24px,6vw,48px) clamp(28px,6vw,52px);
+  text-align:center;
+  position:relative;
+  box-shadow:
+    0 0 0 1px rgba(212,168,67,.3),
+    0 0 40px rgba(192,57,200,.15),
+    0 0 80px rgba(100,20,180,.1),
+    0 60px 120px rgba(0,0,0,.8);
+  animation:cardIn 1.2s cubic-bezier(.16,1,.3,1) both;
+  transform-style:preserve-3d;
+}
+@keyframes cardIn{
+  from{opacity:0;transform:rotateX(20deg) translateY(60px) scale(.92);}
+  to  {opacity:1;transform:rotateX(0deg) translateY(0) scale(1);}
+}
+
+/* aurora inside card */
+.aurora{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 0%,   rgba(180,50,220,.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 100%,  rgba(50,100,255,.1) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 50% 50%,   rgba(212,168,67,.05) 0%, transparent 60%);
+  animation:auroraDrift 8s ease-in-out infinite alternate;
+}
+@keyframes auroraDrift{
+  from{opacity:.8;transform:scale(1);}
+  to  {opacity:1;transform:scale(1.05);}
+}
+
+/* shimmer sweep */
+.shimmer{
+  position:absolute;top:0;left:-100%;width:50%;height:100%;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.04) 50%,transparent 65%);
+  animation:sweep 6s 2s ease-in-out infinite;
+  pointer-events:none;z-index:1;
+}
+@keyframes sweep{0%,100%{left:-60%;}50%{left:160%;}}
+
+/* everything above aurora */
+.card>*:not(.aurora):not(.shimmer){position:relative;z-index:2;}
+
+/* ── GLOW RING border ── */
+.card::before{
+  content:'';
+  position:absolute;inset:0;border-radius:16px;
+  background:linear-gradient(135deg,
+    rgba(212,168,67,.5) 0%,
+    rgba(180,50,220,.4) 25%,
+    rgba(50,100,255,.3) 50%,
+    rgba(180,50,220,.4) 75%,
+    rgba(212,168,67,.5) 100%);
+  background-size:400% 400%;
+  animation:borderGlow 6s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  padding:1.5px;
+  pointer-events:none;z-index:3;
+}
+@keyframes borderGlow{
+  0%  {background-position:0% 50%;}
+  100%{background-position:400% 50%;}
+}
+
+/* ── STARS ROW ── */
+.star-row{
+  display:flex;justify-content:center;gap:clamp(6px,2vw,12px);
+  margin-bottom:clamp(14px,3.5vw,22px);
+  animation:fadeUp .6s .1s both;
+}
+.star-row span{
+  color:rgba(212,168,67,.5);font-size:clamp(.55rem,2vw,.75rem);
+  animation:starPulse 2s ease-in-out infinite;
+}
+.star-row span:nth-child(2){animation-delay:.4s;}
+.star-row span:nth-child(3){animation-delay:.8s;}
+.star-row span:nth-child(4){animation-delay:.4s;}
+.star-row span:nth-child(5){animation-delay:.8s;}
+@keyframes starPulse{0%,100%{opacity:.3;transform:scale(.8);}50%{opacity:1;transform:scale(1.2);}}
+
+/* ── PRE-TITLE ── */
+.pre{
+  font-weight:300;font-style:italic;
+  font-size:clamp(.72rem,2.5vw,.9rem);letter-spacing:.4em;text-transform:uppercase;
+  color:rgba(212,168,67,.7);margin-bottom:8px;
+  animation:fadeUp .6s .18s both;
+}
+
+/* ── NAME ── */
+.name{
+  font-family:'Great Vibes',cursive;
+  font-size:clamp(3.2rem,11vw,5.6rem);
+  line-height:1.1;
+  color:transparent;
+  background:linear-gradient(135deg,#f0d060 0%,#f8f0a0 30%,#d4a843 55%,#f8e080 75%,#c8902a 100%);
+  background-size:200% 200%;
+  -webkit-background-clip:text;background-clip:text;
+  animation:nameIn 1s .3s cubic-bezier(.16,1,.3,1) both, goldShimmer 4s 1.5s ease-in-out infinite;
+  filter:drop-shadow(0 0 20px rgba(212,168,67,.4));
+  margin-bottom:clamp(6px,2vw,12px);
+  padding:0 8px;
+  display:block;
+}
+@keyframes nameIn{
+  from{opacity:0;transform:translateY(20px) scale(.9);}
+  to  {opacity:1;transform:translateY(0) scale(1);}
+}
+@keyframes goldShimmer{
+  0%,100%{background-position:0% 50%;}
+  50%    {background-position:100% 50%;}
+}
+
+/* ── H1 ── */
+h1{
+  font-weight:300;font-style:italic;letter-spacing:.12em;
+  font-size:clamp(1.1rem,4.5vw,1.6rem);
+  color:rgba(255,255,255,.75);
+  margin-bottom:clamp(16px,4vw,26px);
+  animation:fadeUp .6s .45s both;
+}
+h1 em{
+  font-style:normal;font-weight:600;
+  color:rgba(212,168,67,.9);
+}
+
+/* ── DIVIDER ── */
+.div{
+  display:flex;align-items:center;gap:14px;
+  margin:0 auto clamp(16px,4vw,26px);
+  animation:fadeUp .6s .5s both;
+}
+.div::before,.div::after{
+  content:'';flex:1;height:.5px;
+  background:linear-gradient(90deg,transparent,rgba(212,168,67,.4),transparent);
+}
+.div-gem{
+  width:8px;height:8px;
+  background:linear-gradient(135deg,#f0d060,#d4a843);
+  border-radius:1px;
+  transform:rotate(45deg);
+  box-shadow:0 0 10px rgba(212,168,67,.6);
+}
+
+/* ══════════════ SVG CAKE ══════════════ */
+.cake-wrap{
+  display:flex;justify-content:center;
+  margin-bottom:clamp(18px,4vw,28px);
+  animation:fadeUp .7s .56s both;
+}
+.cake-svg{
+  width:clamp(160px,46vw,220px);height:auto;overflow:visible;
+  filter:drop-shadow(0 0 30px rgba(212,168,67,.2)) drop-shadow(0 20px 40px rgba(0,0,0,.4));
+  animation:cakeFloat 4s 1.8s ease-in-out infinite;
+  will-change:transform;
+}
+@keyframes cakeFloat{
+  0%,100%{transform:translateY(0) rotate(-1deg);}
+  50%    {transform:translateY(-12px) rotate(1deg);}
+}
+.l-bot{animation:layerIn .55s .72s cubic-bezier(.36,2,.4,1) both;}
+.l-mid{animation:layerIn .55s .87s cubic-bezier(.36,2,.4,1) both;}
+.l-top{animation:layerIn .55s 1.02s cubic-bezier(.36,2,.4,1) both;}
+@keyframes layerIn{
+  from{opacity:0;transform:translateY(20px) scaleY(.4);}
+  to  {opacity:1;transform:translateY(0) scaleY(1);}
+}
+.drip{stroke-dasharray:500;stroke-dashoffset:500;animation:dripDraw .9s ease forwards;}
+.d1{animation-delay:1.15s;}.d2{animation-delay:1.3s;}.d3{animation-delay:1.45s;}
+@keyframes dripDraw{to{stroke-dashoffset:0;}}
+.cnd{animation:cndPop .45s cubic-bezier(.36,2.2,.4,1) both;}
+.cnd:nth-child(1){animation-delay:1.55s;}
+.cnd:nth-child(2){animation-delay:1.7s;}
+.cnd:nth-child(3){animation-delay:1.85s;}
+@keyframes cndPop{
+  from{opacity:0;transform:scaleY(0);transform-origin:bottom;}
+  to  {opacity:1;transform:scaleY(1);}
+}
+.flame{transform-box:fill-box;transform-origin:50% 100%;animation:flameWave 1s ease-in-out infinite alternate;}
+.fl2{animation-delay:.3s;}.fl3{animation-delay:.6s;}
+@keyframes flameWave{
+  from{transform:scaleX(1) scaleY(1) rotate(-6deg);opacity:1;}
+  to  {transform:scaleX(.68) scaleY(1.35) rotate(6deg);opacity:.75;}
+}
+.halo{animation:haloPulse 1s ease-in-out infinite alternate;}
+.h2{animation-delay:.3s;}.h3{animation-delay:.6s;}
+@keyframes haloPulse{from{opacity:.1;r:10;}to{opacity:.45;r:15;}}
+
+/* orbiting sparkles */
+.orb{transform-origin:110px 90px;animation:orbit 5s linear infinite;}
+.orb2{animation-delay:-1.67s;}.orb3{animation-delay:-3.33s;}
+@keyframes orbit{
+  from{transform:rotate(0deg) translateX(80px) rotate(0deg);}
+  to  {transform:rotate(360deg) translateX(80px) rotate(-360deg);}
+}
+
+/* ── BOTTOM ── */
+.bottom{
+  animation:fadeUp .6s .78s both;
+}
+.wish{
+  font-weight:300;font-style:italic;
+  font-size:clamp(.85rem,3.2vw,1.05rem);
+  color:rgba(255,255,255,.45);
+  letter-spacing:.08em;line-height:1.7;
+  margin-bottom:clamp(12px,3vw,18px);
+}
+.wish strong{color:rgba(212,168,67,.7);font-weight:600;font-style:normal;}
+
+.sig-line{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.sig-line::before,.sig-line::after{
+  content:'';width:28px;height:.5px;
+  background:rgba(212,168,67,.3);
+}
+.sig{
+  font-family:'Great Vibes',cursive;
+  font-size:clamp(1.3rem,4.5vw,1.8rem);
+  color:rgba(212,168,67,.6);
+  letter-spacing:.04em;
+}
+
+/* ── UTILS ── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(14px);}
+  to  {opacity:1;transform:translateY(0);}
+}
+
+@media(max-width:380px){
+  body{padding:12px;}
+  .card{padding:24px 18px 28px;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="scene">
+<div class="card">
+  <div class="aurora"></div>
+  <div class="shimmer"></div>
+
+  <div class="star-row">
+    <span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span>
+  </div>
+
+  <p class="pre">сегодня особенный день</p>
+
+  <div class="name">Севара</div>
+
+  <h1>С&nbsp;<em>Днём Рождения</em>!</h1>
+
+  <div class="div"><div class="div-gem"></div></div>
+
+  <!-- SVG CAKE -->
+  <div class="cake-wrap">
+  <svg class="cake-svg" viewBox="0 0 220 190" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="gb" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#9b59b6"/><stop offset="100%" stop-color="#6c3483"/>
+      </linearGradient>
+      <linearGradient id="gm" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#e8506a"/><stop offset="100%" stop-color="#a93226"/>
+      </linearGradient>
+      <linearGradient id="gt" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#f0c040"/><stop offset="100%" stop-color="#b8860b"/>
+      </linearGradient>
+      <radialGradient id="gy" cx="50%" cy="50%">
+        <stop offset="0%" stop-color="#fde68a"/><stop offset="100%" stop-color="#fde68a" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="fA" cx="50%" cy="80%">
+        <stop offset="0%" stop-color="#fffde7"/><stop offset="50%" stop-color="#ffca28"/>
+        <stop offset="100%" stop-color="#ff7043" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="fB" cx="50%" cy="80%">
+        <stop offset="0%" stop-color="#fffde7"/><stop offset="50%" stop-color="#ffca28"/>
+        <stop offset="100%" stop-color="#e8506a" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="fC" cx="50%" cy="80%">
+        <stop offset="0%" stop-color="#fffde7"/><stop offset="50%" stop-color="#ffca28"/>
+        <stop offset="100%" stop-color="#9b59b6" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="gblur"><feGaussianBlur stdDeviation="3"/></filter>
+      <filter id="gblur2"><feGaussianBlur stdDeviation="1.5"/></filter>
+    </defs>
+
+    <!-- orbiting gems -->
+    <g class="orb">
+      <circle cx="110" cy="10" r="3" fill="#f0c040" opacity=".8"/>
+      <circle cx="110" cy="10" r="5" fill="#f0c040" opacity=".2"/>
+    </g>
+    <g class="orb orb2">
+      <circle cx="110" cy="10" r="2.5" fill="#e8506a" opacity=".8"/>
+    </g>
+    <g class="orb orb3">
+      <circle cx="110" cy="10" r="2.5" fill="#9b59b6" opacity=".8"/>
+    </g>
+
+    <!-- plate glow -->
+    <ellipse cx="110" cy="172" rx="78" ry="10" fill="rgba(150,80,200,.15)" filter="url(#gblur)"/>
+    <!-- plate -->
+    <ellipse cx="110" cy="168" rx="76" ry="10" fill="rgba(255,255,255,.08)"/>
+    <ellipse cx="110" cy="167" rx="72" ry="7" fill="none" stroke="rgba(212,168,67,.5)" stroke-width="1.2"/>
+
+    <!-- BOTTOM — purple -->
+    <g class="l-bot">
+      <!-- glow behind -->
+      <rect x="22" y="126" width="176" height="40" rx="10" fill="rgba(155,89,182,.3)" filter="url(#gblur)"/>
+      <rect x="26" y="126" width="168" height="40" rx="8" fill="url(#gb)"/>
+      <rect x="26" y="126" width="168" height="9"  rx="8" fill="rgba(255,255,255,.15)"/>
+      <!-- sparkle dots -->
+      <circle cx="52"  cy="146" r="3" fill="rgba(255,255,255,.15)"/>
+      <circle cx="80"  cy="138" r="2" fill="rgba(255,255,255,.15)"/>
+      <circle cx="110" cy="146" r="3" fill="rgba(255,255,255,.15)"/>
+      <circle cx="140" cy="138" r="2" fill="rgba(255,255,255,.15)"/>
+      <circle cx="168" cy="146" r="3" fill="rgba(255,255,255,.15)"/>
+      <!-- frosting -->
+      <path class="drip d1"
+        d="M26,130 Q38,116 50,130 Q62,144 74,128 Q86,112 98,128 Q110,144 122,128 Q134,112 146,128 Q158,144 170,130 Q180,120 194,126"
+        fill="none" stroke="rgba(255,255,255,.55)" stroke-width="7" stroke-linecap="round"/>
+    </g>
+
+    <!-- MID — red -->
+    <g class="l-mid">
+      <rect x="40" y="92" width="140" height="36" rx="8" fill="rgba(232,80,106,.25)" filter="url(#gblur)"/>
+      <rect x="44" y="92" width="132" height="36" rx="7" fill="url(#gm)"/>
+      <rect x="44" y="92" width="132" height="8"  rx="7" fill="rgba(255,255,255,.15)"/>
+      <line x1="68"  y1="94" x2="65"  y2="126" stroke="rgba(255,255,255,.12)" stroke-width="2"/>
+      <line x1="94"  y1="94" x2="91"  y2="126" stroke="rgba(255,255,255,.12)" stroke-width="2"/>
+      <line x1="120" y1="94" x2="117" y2="126" stroke="rgba(255,255,255,.12)" stroke-width="2"/>
+      <line x1="146" y1="94" x2="143" y2="126" stroke="rgba(255,255,255,.12)" stroke-width="2"/>
+      <path class="drip d2"
+        d="M44,96 Q55,82 66,96 Q77,110 88,94 Q99,78 110,94 Q121,110 132,94 Q143,80 154,94 Q163,106 176,96"
+        fill="none" stroke="rgba(255,255,255,.5)" stroke-width="6" stroke-linecap="round"/>
+    </g>
+
+    <!-- TOP — gold -->
+    <g class="l-top">
+      <rect x="60" y="62" width="100" height="32" rx="8" fill="rgba(240,192,64,.2)" filter="url(#gblur)"/>
+      <rect x="64" y="62" width="92" height="32"  rx="7" fill="url(#gt)"/>
+      <rect x="64" y="62" width="92" height="8"   rx="7" fill="rgba(255,255,255,.2)"/>
+      <text x="110" y="82" text-anchor="middle" font-family="Georgia,serif" font-size="10" fill="rgba(255,255,255,.4)">♥ ♥ ♥</text>
+      <path class="drip d3"
+        d="M64,66 Q73,54 82,66 Q91,78 100,64 Q109,50 118,64 Q127,78 136,66 Q144,56 156,64"
+        fill="none" stroke="rgba(255,255,255,.5)" stroke-width="5.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- CANDLES -->
+    <!-- c1 left -->
+    <g class="cnd">
+      <rect x="80" y="44" width="10" height="20" rx="3" fill="#e8506a"/>
+      <rect x="80" y="44" width="10" height="5"  rx="3" fill="rgba(255,255,255,.3)"/>
+      <line x1="85" y1="44" x2="85" y2="39" stroke="#ccc" stroke-width="1.2" stroke-linecap="round"/>
+      <circle class="halo"  cx="85" cy="44" r="10" fill="url(#gy)" filter="url(#gblur2)"/>
+      <ellipse class="flame"    cx="85" cy="36" rx="4.5" ry="8" fill="url(#fA)"/>
+    </g>
+    <!-- c2 centre -->
+    <g class="cnd">
+      <rect x="105" y="38" width="10" height="26" rx="3" fill="#9b59b6"/>
+      <rect x="105" y="38" width="10" height="5"  rx="3" fill="rgba(255,255,255,.3)"/>
+      <line x1="110" y1="38" x2="110" y2="33" stroke="#ccc" stroke-width="1.2" stroke-linecap="round"/>
+      <circle class="halo h2" cx="110" cy="38" r="12" fill="url(#gy)" filter="url(#gblur2)"/>
+      <ellipse class="flame fl2"  cx="110" cy="29" rx="5" ry="9" fill="url(#fB)"/>
+    </g>
+    <!-- c3 right -->
+    <g class="cnd">
+      <rect x="130" y="44" width="10" height="20" rx="3" fill="#f0c040"/>
+      <rect x="130" y="44" width="10" height="5"  rx="3" fill="rgba(255,255,255,.3)"/>
+      <line x1="135" y1="44" x2="135" y2="39" stroke="#ccc" stroke-width="1.2" stroke-linecap="round"/>
+      <circle class="halo h3"  cx="135" cy="44" r="10" fill="url(#gy)" filter="url(#gblur2)"/>
+      <ellipse class="flame fl3"  cx="135" cy="36" rx="4.5" ry="8" fill="url(#fC)"/>
+    </g>
+  </svg>
+  </div>
+
+  <div class="div"><div class="div-gem"></div></div>
+
+  <div class="bottom">
+    <p class="wish">
+      Желаю тебе, чтобы каждый день приносил <strong>радость</strong> и поводы для улыбки,
+      чтобы тебя окружали только хорошие люди и исполнялись все твои <strong>мечты и желания</strong>.
+      Пусть жизнь будет <strong>яркой</strong> и полной приятных сюрпризов!
+    </p>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── Particle system ──
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [], mouse = {x:-999,y:-999};
+
+function resize(){
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+window.addEventListener('mousemove', e=>{ mouse.x=e.clientX; mouse.y=e.clientY; });
+
+const COLORS = ['rgba(212,168,67,', 'rgba(180,50,220,', 'rgba(232,80,106,', 'rgba(100,160,255,', 'rgba(255,255,255,'];
+
+class Particle {
+  constructor(){this.reset(true);}
+  reset(init){
+    this.x  = Math.random()*W;
+    this.y  = init ? Math.random()*H : H+10;
+    this.r  = .4 + Math.random()*1.6;
+    this.vx = (Math.random()-.5)*.3;
+    this.vy = -.15 - Math.random()*.4;
+    this.col= COLORS[Math.floor(Math.random()*COLORS.length)];
+    this.a  = 0;
+    this.life=0;
+    this.maxLife = 180+Math.random()*200;
+    if(init) this.life = Math.random()*this.maxLife;
+  }
+  update(){
+    this.life++;
+    if(this.life>this.maxLife){this.reset(false);return;}
+    const half=this.maxLife*.5;
+    this.a = this.life<half ? this.life/half : (this.maxLife-this.life)/half;
+    this.a = Math.min(this.a*.7, .7);
+    // gentle mouse repel
+    const dx=this.x-mouse.x, dy=this.y-mouse.y, dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<120){const f=.4*(1-dist/120);this.vx+=dx/dist*f;this.vy+=dy/dist*f;}
+    this.vx*=.98; this.vy*=.98;
+    this.x+=this.vx; this.y+=this.vy;
+    // subtle wave
+    this.x+=Math.sin(this.life*.02+this.y*.01)*.3;
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+    ctx.fillStyle=this.col+this.a+')';
+    ctx.fill();
+  }
+}
+
+// init 180 particles
+for(let i=0;i<180;i++) particles.push(new Particle());
+
+// occasional big glitter burst
+function burst(){
+  const x=Math.random()*W, y=Math.random()*H*.7;
+  for(let i=0;i<12;i++){
+    const p=new Particle();
+    p.x=x; p.y=y;
+    const angle=Math.random()*Math.PI*2;
+    const speed=.5+Math.random()*2;
+    p.vx=Math.cos(angle)*speed;
+    p.vy=Math.sin(angle)*speed-1;
+    p.r=.8+Math.random()*2;
+    p.life=0; p.maxLife=80+Math.random()*60;
+    particles.push(p);
+  }
+  if(particles.length>300) particles.splice(0,particles.length-300);
+}
+setInterval(burst,2200);
+
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{p.update();p.draw();});
+  requestAnimationFrame(loop);
+}
+loop();
+
+// subtle 3D tilt on mouse
+const card = document.querySelector('.card');
+document.addEventListener('mousemove', e=>{
+  const cx=W/2, cy=H/2;
+  const rx=((e.clientY-cy)/cy)*6;
+  const ry=-((e.clientX-cx)/cx)*6;
+  card.style.transform=`rotateX(${rx}deg) rotateY(${ry}deg)`;
+});
+document.addEventListener('mouseleave',()=>{
+  card.style.transform='rotateX(0) rotateY(0)';
+});
+</script>
+</body>
+</html>
